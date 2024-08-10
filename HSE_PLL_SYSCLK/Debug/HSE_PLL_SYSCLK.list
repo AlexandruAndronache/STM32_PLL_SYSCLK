@@ -27,25 +27,25 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   ALLOC
  11 .ARM.attributes 00000030  00000000  00000000  0000405c  2**0
                   CONTENTS, READONLY
- 12 .debug_info   00007dc7  00000000  00000000  0000408c  2**0
+ 12 .debug_info   00007e0a  00000000  00000000  0000408c  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 13 .debug_abbrev 00001564  00000000  00000000  0000be53  2**0
+ 13 .debug_abbrev 00001565  00000000  00000000  0000be96  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 14 .debug_aranges 00000658  00000000  00000000  0000d3b8  2**3
+ 14 .debug_aranges 00000660  00000000  00000000  0000d400  2**3
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 15 .debug_rnglists 000004d7  00000000  00000000  0000da10  2**0
+ 15 .debug_rnglists 000004de  00000000  00000000  0000da60  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 16 .debug_macro  0002100b  00000000  00000000  0000dee7  2**0
+ 16 .debug_macro  0002100b  00000000  00000000  0000df3e  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 17 .debug_line   00009534  00000000  00000000  0002eef2  2**0
+ 17 .debug_line   000095cb  00000000  00000000  0002ef49  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 18 .debug_str    000c7e72  00000000  00000000  00038426  2**0
+ 18 .debug_str    000c7ee2  00000000  00000000  00038514  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 19 .comment      00000043  00000000  00000000  00100298  2**0
+ 19 .comment      00000043  00000000  00000000  001003f6  2**0
                   CONTENTS, READONLY
- 20 .debug_frame  00001df8  00000000  00000000  001002dc  2**2
+ 20 .debug_frame  00001e1c  00000000  00000000  0010043c  2**2
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 21 .debug_line_str 0000005d  00000000  00000000  001020d4  2**0
+ 21 .debug_line_str 0000005d  00000000  00000000  00102258  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
 
 Disassembly of section .text:
@@ -444,9 +444,9 @@ int main(void)
 	HAL_Init();
  80005c4:	f000 fa12 	bl	80009ec <HAL_Init>
 
-	SystemClock_Config(SYS_CLOCK_FREQ_80_MHZ);
- 80005c8:	2050      	movs	r0, #80	@ 0x50
- 80005ca:	f000 f875 	bl	80006b8 <SystemClock_Config>
+	SystemClock_Config_HSE(SYS_CLOCK_FREQ_50_MHZ);
+ 80005c8:	2032      	movs	r0, #50	@ 0x32
+ 80005ca:	f000 f875 	bl	80006b8 <SystemClock_Config_HSE>
 
 	UART2_Init();
  80005ce:	f000 f907 	bl	80007e0 <UART2_Init>
@@ -555,12 +555,12 @@ int main(void)
  80006b0:	08002d44 	.word	0x08002d44
  80006b4:	08002d58 	.word	0x08002d58
 
-080006b8 <SystemClock_Config>:
+080006b8 <SystemClock_Config_HSE>:
 
 	return 0;
 }
 
-void SystemClock_Config(uint8_t clock_freq)
+void SystemClock_Config_HSE(uint8_t clock_freq)
 {
  80006b8:	b580      	push	{r7, lr}
  80006ba:	b094      	sub	sp, #80	@ 0x50
@@ -568,165 +568,162 @@ void SystemClock_Config(uint8_t clock_freq)
  80006be:	4603      	mov	r3, r0
  80006c0:	71fb      	strb	r3, [r7, #7]
 	RCC_OscInitTypeDef osc_init;
-	RCC_ClkInitTypeDef clk_init;
+		RCC_ClkInitTypeDef clk_init;
 
-	osc_init.OscillatorType = RCC_OSCILLATORTYPE_HSI;
- 80006c2:	2302      	movs	r3, #2
+		osc_init.OscillatorType = RCC_OSCILLATORTYPE_HSE;
+ 80006c2:	2301      	movs	r3, #1
  80006c4:	61fb      	str	r3, [r7, #28]
-	osc_init.HSIState = RCC_HSI_ON;
- 80006c6:	2301      	movs	r3, #1
- 80006c8:	62bb      	str	r3, [r7, #40]	@ 0x28
-	osc_init.HSICalibrationValue = 15;
- 80006ca:	230f      	movs	r3, #15
- 80006cc:	62fb      	str	r3, [r7, #44]	@ 0x2c
-	osc_init.PLL.PLLState = RCC_PLL_ON;
- 80006ce:	2302      	movs	r3, #2
- 80006d0:	637b      	str	r3, [r7, #52]	@ 0x34
-	osc_init.PLL.PLLSource = RCC_PLLSOURCE_HSI;
- 80006d2:	2300      	movs	r3, #0
+		osc_init.HSEState = RCC_HSE_BYPASS;
+ 80006c6:	f44f 23a0 	mov.w	r3, #327680	@ 0x50000
+ 80006ca:	623b      	str	r3, [r7, #32]
+		osc_init.PLL.PLLState = RCC_PLL_ON;
+ 80006cc:	2302      	movs	r3, #2
+ 80006ce:	637b      	str	r3, [r7, #52]	@ 0x34
+		osc_init.PLL.PLLSource = RCC_PLLSOURCE_HSE;
+ 80006d0:	f44f 0380 	mov.w	r3, #4194304	@ 0x400000
  80006d4:	63bb      	str	r3, [r7, #56]	@ 0x38
 
-	switch(clock_freq)
+		switch(clock_freq)
  80006d6:	79fb      	ldrb	r3, [r7, #7]
  80006d8:	2b78      	cmp	r3, #120	@ 0x78
- 80006da:	d038      	beq.n	800074e <SystemClock_Config+0x96>
+ 80006da:	d038      	beq.n	800074e <SystemClock_Config_HSE+0x96>
  80006dc:	2b78      	cmp	r3, #120	@ 0x78
- 80006de:	dc76      	bgt.n	80007ce <SystemClock_Config+0x116>
+ 80006de:	dc76      	bgt.n	80007ce <SystemClock_Config_HSE+0x116>
  80006e0:	2b32      	cmp	r3, #50	@ 0x32
- 80006e2:	d002      	beq.n	80006ea <SystemClock_Config+0x32>
+ 80006e2:	d002      	beq.n	80006ea <SystemClock_Config_HSE+0x32>
  80006e4:	2b50      	cmp	r3, #80	@ 0x50
- 80006e6:	d019      	beq.n	800071c <SystemClock_Config+0x64>
-	    FLatency = FLASH_ACR_LATENCY_3WS;
-		break;
-	}
+ 80006e6:	d019      	beq.n	800071c <SystemClock_Config_HSE+0x64>
+		    FLatency = FLASH_ACR_LATENCY_3WS;
+			break;
+		}
 
-	default:
-		return;
- 80006e8:	e071      	b.n	80007ce <SystemClock_Config+0x116>
-		osc_init.PLL.PLLM = 16;
- 80006ea:	2310      	movs	r3, #16
+		default:
+			return;
+ 80006e8:	e071      	b.n	80007ce <SystemClock_Config_HSE+0x116>
+			osc_init.PLL.PLLM = 8;
+ 80006ea:	2308      	movs	r3, #8
  80006ec:	63fb      	str	r3, [r7, #60]	@ 0x3c
-		osc_init.PLL.PLLN = 100;
+			osc_init.PLL.PLLN = 100;
  80006ee:	2364      	movs	r3, #100	@ 0x64
  80006f0:	643b      	str	r3, [r7, #64]	@ 0x40
-		osc_init.PLL.PLLQ = 2;
+			osc_init.PLL.PLLQ = 2;
  80006f2:	2302      	movs	r3, #2
  80006f4:	64bb      	str	r3, [r7, #72]	@ 0x48
-		osc_init.PLL.PLLR = 2;
+			osc_init.PLL.PLLR = 2;
  80006f6:	2302      	movs	r3, #2
  80006f8:	64fb      	str	r3, [r7, #76]	@ 0x4c
-		osc_init.PLL.PLLP = 2;
+			osc_init.PLL.PLLP = 2;
  80006fa:	2302      	movs	r3, #2
  80006fc:	647b      	str	r3, [r7, #68]	@ 0x44
-	    clk_init.ClockType = RCC_CLOCKTYPE_SYSCLK | RCC_CLOCKTYPE_HCLK | \
+		    clk_init.ClockType = RCC_CLOCKTYPE_SYSCLK | RCC_CLOCKTYPE_HCLK | \
  80006fe:	230f      	movs	r3, #15
  8000700:	60bb      	str	r3, [r7, #8]
-	    clk_init.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
+		    clk_init.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
  8000702:	2302      	movs	r3, #2
  8000704:	60fb      	str	r3, [r7, #12]
-	    clk_init.AHBCLKDivider = RCC_SYSCLK_DIV1;
+		    clk_init.AHBCLKDivider = RCC_SYSCLK_DIV1;
  8000706:	2300      	movs	r3, #0
  8000708:	613b      	str	r3, [r7, #16]
-	    clk_init.APB1CLKDivider = RCC_HCLK_DIV2;
+		    clk_init.APB1CLKDivider = RCC_HCLK_DIV2;
  800070a:	f44f 5380 	mov.w	r3, #4096	@ 0x1000
  800070e:	617b      	str	r3, [r7, #20]
-	    clk_init.APB2CLKDivider = RCC_HCLK_DIV1;
+		    clk_init.APB2CLKDivider = RCC_HCLK_DIV1;
  8000710:	2300      	movs	r3, #0
  8000712:	61bb      	str	r3, [r7, #24]
-	    FLatency = FLASH_ACR_LATENCY_1WS;;
- 8000714:	4b30      	ldr	r3, [pc, #192]	@ (80007d8 <SystemClock_Config+0x120>)
+		    FLatency = FLASH_ACR_LATENCY_1WS;;
+ 8000714:	4b30      	ldr	r3, [pc, #192]	@ (80007d8 <SystemClock_Config_HSE+0x120>)
  8000716:	2201      	movs	r2, #1
  8000718:	701a      	strb	r2, [r3, #0]
-		break;
- 800071a:	e032      	b.n	8000782 <SystemClock_Config+0xca>
-		osc_init.PLL.PLLM = 16;
- 800071c:	2310      	movs	r3, #16
+			break;
+ 800071a:	e032      	b.n	8000782 <SystemClock_Config_HSE+0xca>
+			osc_init.PLL.PLLM = 8;
+ 800071c:	2308      	movs	r3, #8
  800071e:	63fb      	str	r3, [r7, #60]	@ 0x3c
-		osc_init.PLL.PLLN = 160;
+			osc_init.PLL.PLLN = 160;
  8000720:	23a0      	movs	r3, #160	@ 0xa0
  8000722:	643b      	str	r3, [r7, #64]	@ 0x40
-		osc_init.PLL.PLLQ = 2;
+			osc_init.PLL.PLLQ = 2;
  8000724:	2302      	movs	r3, #2
  8000726:	64bb      	str	r3, [r7, #72]	@ 0x48
-		osc_init.PLL.PLLR = 2;
+			osc_init.PLL.PLLR = 2;
  8000728:	2302      	movs	r3, #2
  800072a:	64fb      	str	r3, [r7, #76]	@ 0x4c
-		osc_init.PLL.PLLP = 2;
+			osc_init.PLL.PLLP = 2;
  800072c:	2302      	movs	r3, #2
  800072e:	647b      	str	r3, [r7, #68]	@ 0x44
-	    clk_init.ClockType = RCC_CLOCKTYPE_SYSCLK | RCC_CLOCKTYPE_HCLK | \
+		    clk_init.ClockType = RCC_CLOCKTYPE_SYSCLK | RCC_CLOCKTYPE_HCLK | \
  8000730:	230f      	movs	r3, #15
  8000732:	60bb      	str	r3, [r7, #8]
-	    clk_init.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
+		    clk_init.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
  8000734:	2302      	movs	r3, #2
  8000736:	60fb      	str	r3, [r7, #12]
-	    clk_init.AHBCLKDivider = RCC_SYSCLK_DIV1;
+		    clk_init.AHBCLKDivider = RCC_SYSCLK_DIV1;
  8000738:	2300      	movs	r3, #0
  800073a:	613b      	str	r3, [r7, #16]
-	    clk_init.APB1CLKDivider = RCC_HCLK_DIV2;
+		    clk_init.APB1CLKDivider = RCC_HCLK_DIV2;
  800073c:	f44f 5380 	mov.w	r3, #4096	@ 0x1000
  8000740:	617b      	str	r3, [r7, #20]
-	    clk_init.APB2CLKDivider = RCC_HCLK_DIV1;
+		    clk_init.APB2CLKDivider = RCC_HCLK_DIV1;
  8000742:	2300      	movs	r3, #0
  8000744:	61bb      	str	r3, [r7, #24]
-	    FLatency = FLASH_ACR_LATENCY_2WS;
- 8000746:	4b24      	ldr	r3, [pc, #144]	@ (80007d8 <SystemClock_Config+0x120>)
+		    FLatency = FLASH_ACR_LATENCY_2WS;
+ 8000746:	4b24      	ldr	r3, [pc, #144]	@ (80007d8 <SystemClock_Config_HSE+0x120>)
  8000748:	2202      	movs	r2, #2
  800074a:	701a      	strb	r2, [r3, #0]
-		break;
- 800074c:	e019      	b.n	8000782 <SystemClock_Config+0xca>
-		osc_init.PLL.PLLM = 16;
- 800074e:	2310      	movs	r3, #16
+			break;
+ 800074c:	e019      	b.n	8000782 <SystemClock_Config_HSE+0xca>
+			osc_init.PLL.PLLM = 8;
+ 800074e:	2308      	movs	r3, #8
  8000750:	63fb      	str	r3, [r7, #60]	@ 0x3c
-		osc_init.PLL.PLLN = 240;
+			osc_init.PLL.PLLN = 240;
  8000752:	23f0      	movs	r3, #240	@ 0xf0
  8000754:	643b      	str	r3, [r7, #64]	@ 0x40
-		osc_init.PLL.PLLQ = 2;
+			osc_init.PLL.PLLQ = 2;
  8000756:	2302      	movs	r3, #2
  8000758:	64bb      	str	r3, [r7, #72]	@ 0x48
-		osc_init.PLL.PLLR = 2;
- 800075a:	2302      	movs	r3, #2
+			osc_init.PLL.PLLR = 1;
+ 800075a:	2301      	movs	r3, #1
  800075c:	64fb      	str	r3, [r7, #76]	@ 0x4c
-		osc_init.PLL.PLLP = 4;
+			osc_init.PLL.PLLP = 4;
  800075e:	2304      	movs	r3, #4
  8000760:	647b      	str	r3, [r7, #68]	@ 0x44
-	    clk_init.ClockType = RCC_CLOCKTYPE_SYSCLK | RCC_CLOCKTYPE_HCLK | \
+		    clk_init.ClockType = RCC_CLOCKTYPE_SYSCLK | RCC_CLOCKTYPE_HCLK | \
  8000762:	230f      	movs	r3, #15
  8000764:	60bb      	str	r3, [r7, #8]
-	    clk_init.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
+		    clk_init.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
  8000766:	2302      	movs	r3, #2
  8000768:	60fb      	str	r3, [r7, #12]
-	    clk_init.AHBCLKDivider = RCC_SYSCLK_DIV1;
+		    clk_init.AHBCLKDivider = RCC_SYSCLK_DIV1;
  800076a:	2300      	movs	r3, #0
  800076c:	613b      	str	r3, [r7, #16]
-	    clk_init.APB1CLKDivider = RCC_HCLK_DIV4;
+		    clk_init.APB1CLKDivider = RCC_HCLK_DIV4;
  800076e:	f44f 53a0 	mov.w	r3, #5120	@ 0x1400
  8000772:	617b      	str	r3, [r7, #20]
-	    clk_init.APB2CLKDivider = RCC_HCLK_DIV2;
+		    clk_init.APB2CLKDivider = RCC_HCLK_DIV2;
  8000774:	f44f 5380 	mov.w	r3, #4096	@ 0x1000
  8000778:	61bb      	str	r3, [r7, #24]
-	    FLatency = FLASH_ACR_LATENCY_3WS;
- 800077a:	4b17      	ldr	r3, [pc, #92]	@ (80007d8 <SystemClock_Config+0x120>)
+		    FLatency = FLASH_ACR_LATENCY_3WS;
+ 800077a:	4b17      	ldr	r3, [pc, #92]	@ (80007d8 <SystemClock_Config_HSE+0x120>)
  800077c:	2203      	movs	r2, #3
  800077e:	701a      	strb	r2, [r3, #0]
-		break;
+			break;
  8000780:	bf00      	nop
-	}
+		}
 
-	if(HAL_RCC_OscConfig(&osc_init) != HAL_OK)
+		if(HAL_RCC_OscConfig(&osc_init) != HAL_OK)
  8000782:	f107 031c 	add.w	r3, r7, #28
  8000786:	4618      	mov	r0, r3
  8000788:	f000 ffbc 	bl	8001704 <HAL_RCC_OscConfig>
  800078c:	4603      	mov	r3, r0
  800078e:	2b00      	cmp	r3, #0
- 8000790:	d001      	beq.n	8000796 <SystemClock_Config+0xde>
-		{
-		Error_handler();
+ 8000790:	d001      	beq.n	8000796 <SystemClock_Config_HSE+0xde>
+			{
+			Error_handler();
  8000792:	f000 f84b 	bl	800082c <Error_handler>
-		}
+			}
 
-	if(HAL_RCC_ClockConfig( &clk_init, FLatency) != HAL_OK)
- 8000796:	4b10      	ldr	r3, [pc, #64]	@ (80007d8 <SystemClock_Config+0x120>)
+		if(HAL_RCC_ClockConfig( &clk_init, FLatency) != HAL_OK)
+ 8000796:	4b10      	ldr	r3, [pc, #64]	@ (80007d8 <SystemClock_Config_HSE+0x120>)
  8000798:	781b      	ldrb	r3, [r3, #0]
  800079a:	461a      	mov	r2, r3
  800079c:	f107 0308 	add.w	r3, r7, #8
@@ -735,27 +732,28 @@ void SystemClock_Config(uint8_t clock_freq)
  80007a4:	f000 fc64 	bl	8001070 <HAL_RCC_ClockConfig>
  80007a8:	4603      	mov	r3, r0
  80007aa:	2b00      	cmp	r3, #0
- 80007ac:	d001      	beq.n	80007b2 <SystemClock_Config+0xfa>
-		{
-			Error_handler();
+ 80007ac:	d001      	beq.n	80007b2 <SystemClock_Config_HSE+0xfa>
+			{
+				Error_handler();
  80007ae:	f000 f83d 	bl	800082c <Error_handler>
-		}
+			}
 
-	//Systick frequency
-	HAL_SYSTICK_Config(HAL_RCC_GetHCLKFreq() / 1000);
+		//Systick frequency
+		HAL_SYSTICK_Config(HAL_RCC_GetHCLKFreq() / 1000);
  80007b2:	f000 fd43 	bl	800123c <HAL_RCC_GetHCLKFreq>
  80007b6:	4603      	mov	r3, r0
- 80007b8:	4a08      	ldr	r2, [pc, #32]	@ (80007dc <SystemClock_Config+0x124>)
+ 80007b8:	4a08      	ldr	r2, [pc, #32]	@ (80007dc <SystemClock_Config_HSE+0x124>)
  80007ba:	fba2 2303 	umull	r2, r3, r2, r3
  80007be:	099b      	lsrs	r3, r3, #6
  80007c0:	4618      	mov	r0, r3
  80007c2:	f000 fa8a 	bl	8000cda <HAL_SYSTICK_Config>
-	HAL_SYSTICK_CLKSourceConfig(SYSTICK_CLKSOURCE_HCLK);
+		HAL_SYSTICK_CLKSourceConfig(SYSTICK_CLKSOURCE_HCLK);
  80007c6:	2004      	movs	r0, #4
  80007c8:	f000 fa94 	bl	8000cf4 <HAL_SYSTICK_CLKSourceConfig>
- 80007cc:	e000      	b.n	80007d0 <SystemClock_Config+0x118>
-		return;
+ 80007cc:	e000      	b.n	80007d0 <SystemClock_Config_HSE+0x118>
+			return;
  80007ce:	bf00      	nop
+
 }
  80007d0:	3750      	adds	r7, #80	@ 0x50
  80007d2:	46bd      	mov	sp, r7
